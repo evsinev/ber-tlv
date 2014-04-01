@@ -1,0 +1,126 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+
+    <artifactId>ber-tlv</artifactId>
+    <groupId>com.payneteasy.ber-tlv</groupId>
+    <version>1.0-1-SNAPSHOT</version>
+
+    <name>ber-tlv  ${version}</name>
+
+    <description>BER-TLV reader and writer</description>
+
+    <url>https://github.com/evsinev/j2me-hotp</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:evsinev/ber-tlv.git</connection>
+        <developerConnection>scm:git:git@github.com:evsinev/ber-tlv.git</developerConnection>
+        <url>https://github.com/evsinev/j2me-hotp</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Evgeniy Sinev</name>
+            <email>esinev@gmail.com</email>
+        </developer>
+    </developers>
+
+    <!--
+    -      Distributions
+    -->
+    <distributionManagement>
+        <repository>
+            <id>ber-tlv-release</id>
+            <name>sonatype oss RELEASE repository</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>ber-tlv-snapshot</id>
+            <name>sonatype oss SNAPSHOT repository</name>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.6</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.6</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <inherited>true</inherited>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <debug>true</debug>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- signs artifacts. This profile will be activated when the value of maven property performRelease is true -->
+    <profiles>
+        <profile>
+            <id>release-profile</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+
+                    <!-- SIGNS -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <properties>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+</project>
