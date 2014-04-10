@@ -10,6 +10,10 @@ public class BerTlvParser {
 
     private final IBerTlvLogger log;
 
+    public BerTlvParser() {
+        this(EMPTY_LOGGER);
+    }
+
     public BerTlvParser(IBerTlvLogger aLogger) {
         log = aLogger;
     }
@@ -178,6 +182,16 @@ public class BerTlvParser {
             return 1;
         }
     }
+
+
+    private static final IBerTlvLogger EMPTY_LOGGER = new IBerTlvLogger() {
+        public boolean isDebugEnabled() {
+            return false;
+        }
+
+        public void debug(String aFormat, Object... args) {
+        }
+    };
 
 
 }
