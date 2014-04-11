@@ -1,5 +1,6 @@
 package com.payneteasy.tlv;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,6 +8,8 @@ import java.util.List;
  *
  */
 public class BerTlv {
+
+    private final static Charset UTF8 = Charset.forName("UTF-8");
 
     public BerTlv(BerTag aTag, List<BerTlv> aList) {
         theTag = aTag;
@@ -57,11 +60,19 @@ public class BerTlv {
     private final byte[] theValue;
     private List<BerTlv> theList;
 
+    /**
+     * Text value with UTF-8 charset
+     * @return text
+     */
     public String getTextValue() {
+        return getTextValue(UTF8);
+    }
+
+    public String getTextValue(Charset aCharset) {
         if(isConstructed()) {
             throw new IllegalStateException("TLV is constructed");
         }
-        return new String(theValue);
+        return new String(theValue, aCharset);
     }
 
     public BerTlv find(BerTag aTag) {
