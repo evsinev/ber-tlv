@@ -1,7 +1,9 @@
 package com.payneteasy.tlv;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -92,6 +94,19 @@ public class BerTlv {
         return null;
     }
 
+    public List<BerTlv> findAll(BerTag aTag) {
+        List<BerTlv> list = new ArrayList<BerTlv>();
+        if(aTag.equals(getTag())) {
+            list.add(this);
+            return list;
+        } else if(isConstructed()) {
+            for (BerTlv tlv : theList) {
+                list.addAll(tlv.findAll(aTag));
+            }
+        }
+        return list;
+    }
+
     public byte[] getBytes() {
         if(isConstructed()) {
             throw new IllegalStateException("TLV is constructed");
@@ -109,4 +124,6 @@ public class BerTlv {
             number = number * 256 + ( j<0 ? j+=256 : j);
         }
         return number;
-    }}
+    }
+
+}

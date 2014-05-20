@@ -23,6 +23,13 @@ public class BerTlvs {
         return null;
     }
 
+    public List<BerTlv> findAll(BerTag aTag) {
+        List<BerTlv> list = new ArrayList<BerTlv>();
+        for (BerTlv tlv : tlvs) {
+            list.addAll(tlv.findAll(aTag));
+        }
+        return list;
+    }
 
     private final List<BerTlv> tlvs = new ArrayList<BerTlv>();
 }

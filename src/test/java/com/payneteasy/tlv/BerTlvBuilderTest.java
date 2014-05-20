@@ -3,7 +3,15 @@ package com.payneteasy.tlv;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
+import static com.payneteasy.tlv.BerTlvBuilder.template;
+
 public class BerTlvBuilderTest {
+
+    public static final BerTag TAG_E0 = new BerTag(0xe0);
+    public static final BerTag TAG_86 = new BerTag(0x86);
+    public static final BerTag TAG_71 = new BerTag(0x71);
 
     /**
      * 1 [main] DEBUG c.p.i.t.BerTlvLogger                               -      -50 = 56495341
@@ -44,5 +52,34 @@ public class BerTlvBuilderTest {
                 .addHex(new BerTag(0x57), "1000023100000033D44122011003400000481F")
                 .buildArray();
         Assert.assertArrayEquals(HexUtil.parseHex("50045649534157131000023100000033D44122011003400000481F"), bytes);
+    }
+
+    @Test
+    public void test91() {
+        BerTlvBuilder b = template(TAG_E0);
+
+        for(int i=0; i<10; i++) {
+            b.addHex(TAG_86, "F9128478E28F860D8424000008514C8F");
+        }
+        byte[] buf = b.buildArray();
+        System.out.println(HexUtil.toFormattedHexString(buf));
+    }
+
+    @Test
+    public void testComplex() {
+        byte[] bytes = template(TAG_E0)
+                .add(
+                        template(TAG_71)
+                                .addHex(TAG_86, "F9128478E28F860D8424000008514C01")
+                                .addHex(TAG_86, "F9128478E28F860D8424000008514C02")
+                )
+                .addHex(TAG_86, "F9128478E28F860D8424000008514C03")
+                .buildArray();
+        System.out.println(HexUtil.toFormattedHexString(bytes));
+
+        BerTlv tlv = new BerTlvParser().parseConstructed(bytes, 0, bytes.length);
+        List<BerTlv> list = tlv.findAll(TAG_86);
+        System.out.println("list = " + list);
+
     }
 }
