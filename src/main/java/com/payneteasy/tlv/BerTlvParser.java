@@ -49,14 +49,14 @@ public class BerTlvParser {
             throw new IllegalStateException("Length is out of the range [offset="+aOffset+",  len="+aLen+", array.length="+aBuf.length+", level="+aLevel+"]");
         }
         if(log.isDebugEnabled()) {
-            log.debug("{}parseWithResult(level={}, offset={}, len={}, buf={})", levelPadding, aLevel, aOffset, aLen, HexUtil.toHexString(aBuf, aOffset, aLen));
+            log.debug("{}parseWithResult(level={}, offset={}, len={}, buf={})", levelPadding, aLevel, aOffset, aLen, HexUtil.toFormattedHexString(aBuf, aOffset, aLen));
         }
 
         // tag
         int tagOffset = getTagOffset(aBuf, aOffset);
-        BerTag tag = findTag(aBuf, aOffset, tagOffset);
+        BerTag tag = findTag(levelPadding, aBuf, aOffset, tagOffset);
         if(log.isDebugEnabled()) {
-            log.debug("{}    tag = {}, buf={}", levelPadding, tag, HexUtil.toHexString(aBuf, aOffset, tagOffset));
+            log.debug("{}tag = {}, tagOffset={}, tagBuf={}", levelPadding, tag, tagOffset, HexUtil.toHexString(aBuf, aOffset, tagOffset));
         }
 
         // length
@@ -64,7 +64,7 @@ public class BerTlvParser {
         int valueLength = getDataLength(aBuf, aOffset + tagOffset);
 
         if(log.isDebugEnabled()) {
-            log.debug("{}    len = {}, buf = {}"
+            log.debug("{}len = {}, lenBuf = {}"
                     , levelPadding, valueLength, HexUtil.toHexString(aBuf, aOffset + tagOffset, dataOffset));
         }
 
@@ -76,7 +76,7 @@ public class BerTlvParser {
 
             int resultOffset = aOffset + tagOffset + dataOffset + valueLength;
             if(log.isDebugEnabled()) {
-                log.debug("{}    returning constructed offset = {}", levelPadding, resultOffset);
+                log.debug("{}returning constructed offset = {}", levelPadding, resultOffset);
             }
             return new ParseResult(new BerTlv(tag, list), resultOffset);
         } else {
@@ -85,7 +85,8 @@ public class BerTlvParser {
             System.arraycopy(aBuf, aOffset+tagOffset+dataOffset, value, 0, valueLength);
             int resultOffset = aOffset + tagOffset + dataOffset + valueLength;
             if(log.isDebugEnabled()) {
-                log.debug("{}    returning primitive offset = {}", levelPadding, resultOffset);
+                log.debug("{}value = {}", levelPadding, HexUtil.toFormattedHexString(value));
+                log.debug("{}returning primitive offset = {}", levelPadding, resultOffset);
             }
             return new ParseResult(new BerTlv(tag, value), resultOffset);
         }
@@ -98,7 +99,7 @@ public class BerTlvParser {
         while( conOffset < dataOffset+valueLength) {
             ParseResult result = parseWithResult(aLevel+1, aBuf, conOffset, conLen);
             if(log.isDebugEnabled()) {
-                log.debug("{}    level {}: adding {} with offset {}", levelPadding, aLevel, result.tlv.getTag(), result.offset);
+                log.debug("{}level {}: adding {} with offset {}", levelPadding, aLevel, result.tlv.getTag(), result.offset);
             }
             conOffset = result.offset;
             conLen = valueLength-conOffset;
@@ -107,6 +108,10 @@ public class BerTlvParser {
     }
 
     private String createLevelPadding(int aLevel) {
+        if(!log.isDebugEnabled()) {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
         for(int i=0; i<aLevel*4; i++) {
             sb.append(' ');
@@ -133,9 +138,9 @@ public class BerTlvParser {
     }
 
 
-    private BerTag findTag(byte[] aBuf, int aOffset, int aLength) {
+    private BerTag findTag(String aLevelPadding, byte[] aBuf, int aOffset, int aLength) {
         if(log.isDebugEnabled()) {
-            log.debug("Creating tag {}", HexUtil.toHexString(aBuf, aOffset, aLength));
+            log.debug("{}Creating tag {}...", aLevelPadding, HexUtil.toHexString(aBuf, aOffset, aLength));
         }
         return new BerTag(aBuf, aOffset, aLength);
     }
@@ -162,7 +167,9 @@ public class BerTlvParser {
 
         if((length & 0x80) == 0x80) {
             int numberOfBytes = length & 0x7f;
-            if(numberOfBytes>3) throw new IllegalStateException("Bad number of bytes "+numberOfBytes);
+            if(numberOfBytes>3) {
+                throw new IllegalStateException(String.format("At position %d the len is more then 3 [%d]", aOffset, numberOfBytes));
+            }
 
             length = 0;
             for(int i=aOffset+1; i<aOffset+1+numberOfBytes; i++) {
