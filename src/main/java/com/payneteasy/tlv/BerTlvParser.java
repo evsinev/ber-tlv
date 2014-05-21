@@ -18,9 +18,17 @@ public class BerTlvParser {
         log = aLogger;
     }
 
+    public BerTlv parseConstructed(byte[] aBuf) {
+        return parseConstructed(aBuf, 0, aBuf.length);
+    }
+
     public BerTlv parseConstructed(byte[] aBuf, int aOffset, int aLen) {
         ParseResult result =  parseWithResult(0, aBuf, aOffset, aLen);
         return result.tlv;
+    }
+
+    public BerTlvs parse(byte[] aBuf) {
+        return parse(aBuf, 0, aBuf.length);
     }
 
     public BerTlvs parse(byte[] aBuf, final int aOffset, int aLen) {

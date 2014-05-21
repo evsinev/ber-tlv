@@ -2,6 +2,7 @@ package com.payneteasy.tlv;
 
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,8 +11,9 @@ import java.util.Date;
  */
 public class BerTlvBuilder {
 
-    public static final BigDecimal HUNDRED = new BigDecimal(100);
-    public static final int DEFAULT_SIZE = 1024;
+    private static final Charset ASCII = Charset.forName("US-ASCII");
+    private static final BigDecimal HUNDRED = new BigDecimal(100);
+    private static final int DEFAULT_SIZE = 1024;
 
     public BerTlvBuilder() {
         this(null);
@@ -165,7 +167,30 @@ public class BerTlvBuilder {
 
 
     public BerTlvBuilder addBerTlv(BerTlv aTlv) {
-        return addBytes(aTlv.getTag(), aTlv.getBytes());
+        return addBytes(aTlv.getTag(), aTlv.getBytesValue());
+    }
+
+    /**
+     * Add ASCII text
+     *
+     * @param aTag   tag
+     * @param aText  text
+     * @return builder
+     */
+    public BerTlvBuilder addText(BerTag aTag, String aText) {
+        return addText(aTag, aText, ASCII);
+    }
+
+    /**
+     * Add ASCII text
+     *
+     * @param aTag   tag
+     * @param aText  text
+     * @return builder
+     */
+    public BerTlvBuilder addText(BerTag aTag, String aText, Charset aCharset) {
+        byte[] buffer = aText.getBytes(aCharset);
+        return addBytes(aTag, buffer, 0, buffer.length);
     }
 
     public BerTlvBuilder addIntAsHex(BerTag aObject, int aCode, int aLength) {

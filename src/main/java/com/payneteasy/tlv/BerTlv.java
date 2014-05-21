@@ -3,7 +3,6 @@ package com.payneteasy.tlv;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -11,33 +10,42 @@ import java.util.List;
  */
 public class BerTlv {
 
-    private final static Charset UTF8 = Charset.forName("UTF-8");
+    private final static Charset ASCII = Charset.forName("US-ASCII");
 
+    private final BerTag theTag;
+    private final byte[] theValue;
+    private final List<BerTlv> theList;
+
+    /**
+     * Creates constructed TLV
+     *
+     * @param aTag   tag
+     * @param aList  set of nested TLVs
+     */
     public BerTlv(BerTag aTag, List<BerTlv> aList) {
         theTag = aTag;
         theList = aList;
         theValue = null;
-
     }
 
+    /**
+     * Creates primitive TLV
+     *
+     * @param aTag   tag
+     * @param aValue value as byte[]
+     */
     public BerTlv(BerTag aTag, byte[] aValue) {
         theTag = aTag;
         theValue = aValue;
         theList = null;
     }
 
+    //
+    //
+    //
+
     public BerTag getTag() {
         return theTag;
-    }
-
-    public String getHexValue() {
-        if(isConstructed()) throw new IllegalStateException("Tag is CONSTRUCTED "+ HexUtil.toHexString(theTag.bytes));
-        return HexUtil.toHexString(theValue);
-    }
-
-    public List<BerTlv> getValues() {
-        if(isPrimitive()) throw  new IllegalStateException("Tag is PRIMITIVE");
-        return theList;
     }
 
     public boolean isPrimitive() {
@@ -48,34 +56,13 @@ public class BerTlv {
         return theTag.isConstructed();
     }
 
-    @Override
-    public String toString() {
-
-        return "BerTlv{" +
-                "theTag=" + theTag +
-                ", theValue=" + Arrays.toString(theValue) +
-                ", theList=" + theList +
-                '}';
+    public boolean isTag(BerTag aTag) {
+        return theTag.equals(aTag);
     }
 
-    private final BerTag theTag;
-    private final byte[] theValue;
-    private List<BerTlv> theList;
-
-    /**
-     * Text value with UTF-8 charset
-     * @return text
-     */
-    public String getTextValue() {
-        return getTextValue(UTF8);
-    }
-
-    public String getTextValue(Charset aCharset) {
-        if(isConstructed()) {
-            throw new IllegalStateException("TLV is constructed");
-        }
-        return new String(theValue, aCharset);
-    }
+    //
+    // find
+    //
 
     public BerTlv find(BerTag aTag) {
         if(aTag.equals(getTag())) {
@@ -107,14 +94,38 @@ public class BerTlv {
         return list;
     }
 
-    public byte[] getBytes() {
+    //
+    // getters
+    //
+
+    public String getHexValue() {
+        if(isConstructed()) throw new IllegalStateException("Tag is CONSTRUCTED "+ HexUtil.toHexString(theTag.bytes));
+        return HexUtil.toHexString(theValue);
+    }
+
+    /**
+     * Text value with US-ASCII charset
+     * @return text
+     */
+    public String getTextValue() {
+        return getTextValue(ASCII);
+    }
+
+    public String getTextValue(Charset aCharset) {
+        if(isConstructed()) {
+            throw new IllegalStateException("TLV is constructed");
+        }
+        return new String(theValue, aCharset);
+    }
+
+    public byte[] getBytesValue() {
         if(isConstructed()) {
             throw new IllegalStateException("TLV is constructed");
         }
         return theValue;
     }
 
-    public int valueAsNumber() {
+    public int getIntValue() {
         int i=0;
         int j=0;
         int number = 0;
@@ -124,6 +135,21 @@ public class BerTlv {
             number = number * 256 + ( j<0 ? j+=256 : j);
         }
         return number;
+    }
+
+    public List<BerTlv> getValues() {
+        if(isPrimitive()) throw  new IllegalStateException("Tag is PRIMITIVE");
+        return theList;
+    }
+
+    @Override
+    public String toString() {
+
+        return "BerTlv{" +
+                "theTag=" + theTag +
+                ", theValue=" + Arrays.toString(theValue) +
+                ", theList=" + theList +
+                '}';
     }
 
 }
