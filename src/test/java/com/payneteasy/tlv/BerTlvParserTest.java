@@ -1,10 +1,14 @@
 package com.payneteasy.tlv;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class BerTlvParserTest {
 
+    public static final BerTag TAG_DF0D_ID = new BerTag(0xdf, 0x0d);
+    public static final BerTag TAG_DF7F_VERSION = new BerTag(0xdf, 0x7f);
     private static final BerTlvLoggerSlf4j LOG = new BerTlvLoggerSlf4j();
+    public static final BerTag T_EF = new BerTag(0xEF);
 
     @Test
     public void testParse() {
@@ -12,12 +16,13 @@ public class BerTlvParserTest {
         parse(hex);
     }
 
-    private void parse(String hex) {
+    private BerTlvs parse(String hex) {
         byte[] bytes = HexUtil.parseHex(hex);
 
         BerTlvParser parser = new BerTlvParser(LOG);
         BerTlvs tlvs = parser.parse(bytes, 0, bytes.length);
         BerTlvLogger.log("    ", tlvs, LOG);
+        return tlvs;
     }
 
     @Test
@@ -32,6 +37,26 @@ public class BerTlvParserTest {
                  "                      DB0C9559860D84240000082A5A0A9A82\n" +
                  "                      8ABA0A910A42500E4381A4677A30308A\n" +
                  "                      023030\n");
+
+
+    }
+
+
+    @Test
+    public void testMulti() {
+        BerTlvs tlvs = parse("e1 35 9f 1e 08 31 36 30 32 31 34 33 37 ef 12 df 0d 08 4d 30 30 30 2d 4d 50 49 df 7f 04 31 2d 32 32 ef 14 df 0d 0b 4d 30 30 30 2d 54 45 53 54 4f 53 df 7f 03 36 2d 35");
+        Assert.assertNotNull(tlvs.find(new BerTag(0xe1)));
+        Assert.assertEquals("1 6 0 2 1 4 3 7".replace(" ", ""), tlvs.find(new BerTag(0x9f, 0x1e)).getTextValue());
+        Assert.assertNotNull(tlvs.find(T_EF));
+        Assert.assertEquals(2, tlvs.findAll(T_EF).size());
+
+        // first EF
+        BerTlv firstEf = tlvs.find(T_EF);
+        Assert.assertNotNull(firstEf);
+        Assert.assertNotNull(firstEf.find(TAG_DF0D_ID));
+        Assert.assertEquals("M000-MPI", firstEf.find(TAG_DF0D_ID).getTextValue());
+        Assert.assertNotNull("No EF / DF7F tag found", firstEf.find(TAG_DF7F_VERSION));
+        Assert.assertEquals("1-22", firstEf.find(TAG_DF7F_VERSION).getTextValue());
 
 
     }

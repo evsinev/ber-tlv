@@ -18,12 +18,12 @@ public class BerTlvLogger {
         }
 
         if (aTlv.isConstructed()) {
-            aLogger.debug("{} {}", aPadding, aTlv.getTag());
+            aLogger.debug("{} [{}]", aPadding, HexUtil.toHexString(aTlv.getTag().bytes));
             for (BerTlv child : aTlv.getValues()) {
                 log(aPadding + "    ", child, aLogger);
             }
         } else {
-            aLogger.debug("{} {} = {}", aPadding, aTlv.getTag(), aTlv.getHexValue());
+            aLogger.debug("{} [{}] {}", aPadding, HexUtil.toHexString(aTlv.getTag().bytes), aTlv.getHexValue());
         }
 
     }

@@ -61,28 +61,28 @@ public class BerTlvParser {
         }
 
         // tag
-        int tagOffset = getTagOffset(aBuf, aOffset);
-        BerTag tag = findTag(levelPadding, aBuf, aOffset, tagOffset);
+        int tagBytesCount = getTagBytesCount(aBuf, aOffset);
+        BerTag tag        = createTag(levelPadding, aBuf, aOffset, tagBytesCount);
         if(log.isDebugEnabled()) {
-            log.debug("{}tag = {}, tagOffset={}, tagBuf={}", levelPadding, tag, tagOffset, HexUtil.toHexString(aBuf, aOffset, tagOffset));
+            log.debug("{}tag = {}, tagBytesCount={}, tagBuf={}", levelPadding, tag, tagBytesCount, HexUtil.toFormattedHexString(aBuf, aOffset, tagBytesCount));
         }
 
         // length
-        int dataOffset = getDataOffset(aBuf, aOffset + tagOffset);
-        int valueLength = getDataLength(aBuf, aOffset + tagOffset);
+        int lengthBytesCount  = getLengthBytesCount(aBuf, aOffset + tagBytesCount);
+        int valueLength       = getDataLength(aBuf, aOffset + tagBytesCount);
 
         if(log.isDebugEnabled()) {
-            log.debug("{}len = {}, lenBuf = {}"
-                    , levelPadding, valueLength, HexUtil.toHexString(aBuf, aOffset + tagOffset, dataOffset));
+            log.debug("{}lenBytesCount = {}, len = {}, lenBuf = {}"
+                    , levelPadding, lengthBytesCount, valueLength, HexUtil.toFormattedHexString(aBuf, aOffset + tagBytesCount, lengthBytesCount));
         }
 
         // value
         if(tag.isConstructed()) {
 
             ArrayList<BerTlv> list = new ArrayList<BerTlv>();
-            addChildren(aLevel, aBuf, aOffset, levelPadding, tagOffset, dataOffset, valueLength, list);
+            addChildren(aLevel, aBuf, aOffset, levelPadding, tagBytesCount, lengthBytesCount, valueLength, list);
 
-            int resultOffset = aOffset + tagOffset + dataOffset + valueLength;
+            int resultOffset = aOffset + tagBytesCount + lengthBytesCount + valueLength;
             if(log.isDebugEnabled()) {
                 log.debug("{}returning constructed offset = {}", levelPadding, resultOffset);
             }
@@ -90,8 +90,8 @@ public class BerTlvParser {
         } else {
             // value
             byte[] value = new byte[valueLength];
-            System.arraycopy(aBuf, aOffset+tagOffset+dataOffset, value, 0, valueLength);
-            int resultOffset = aOffset + tagOffset + dataOffset + valueLength;
+            System.arraycopy(aBuf, aOffset+tagBytesCount+lengthBytesCount, value, 0, valueLength);
+            int resultOffset = aOffset + tagBytesCount + lengthBytesCount + valueLength;
             if(log.isDebugEnabled()) {
                 log.debug("{}value = {}", levelPadding, HexUtil.toFormattedHexString(value));
                 log.debug("{}returning primitive offset = {}", levelPadding, resultOffset);
@@ -101,17 +101,31 @@ public class BerTlvParser {
 
     }
 
-    private void addChildren(int aLevel, byte[] aBuf, int aOffset, String levelPadding, int tagOffset, int dataOffset, int valueLength, ArrayList<BerTlv> list) {
-        int conOffset = aOffset+tagOffset+dataOffset;
-        int conLen = valueLength;
-        while( conOffset < dataOffset+valueLength) {
-            ParseResult result = parseWithResult(aLevel+1, aBuf, conOffset, conLen);
-            if(log.isDebugEnabled()) {
-                log.debug("{}level {}: adding {} with offset {}", levelPadding, aLevel, result.tlv.getTag(), result.offset);
-            }
-            conOffset = result.offset;
-            conLen = valueLength-conOffset;
+    /**
+     *
+     * @param aLevel          level for debug
+     * @param aBuf            buffer
+     * @param aOffset         offset (first byte)
+     * @param levelPadding    level padding (for debug)
+     * @param aTagBytesCount  tag bytes count
+     * @param aDataBytesCount data bytes count
+     * @param valueLength     length
+     * @param list            list to add
+     */
+    private void addChildren(int aLevel, byte[] aBuf, int aOffset, String levelPadding, int aTagBytesCount, int aDataBytesCount, int valueLength, ArrayList<BerTlv> list) {
+        int startPosition = aOffset + aTagBytesCount + aDataBytesCount;
+        int len = valueLength;
+        while (startPosition < aOffset + valueLength) {
+            ParseResult result = parseWithResult(aLevel+1, aBuf, startPosition, len);
             list.add(result.tlv);
+
+            startPosition = result.offset;
+            len           = valueLength - startPosition;
+
+            if(log.isDebugEnabled()) {
+                log.debug("{}level {}: adding {} with offset {}, startPosition={}, aDataBytesCount={}, valueLength={}"
+                        , levelPadding, aLevel, result.tlv.getTag(), result.offset, startPosition, aDataBytesCount, valueLength);
+            }
         }
     }
 
@@ -146,14 +160,14 @@ public class BerTlvParser {
     }
 
 
-    private BerTag findTag(String aLevelPadding, byte[] aBuf, int aOffset, int aLength) {
+    private BerTag createTag(String aLevelPadding, byte[] aBuf, int aOffset, int aLength) {
         if(log.isDebugEnabled()) {
-            log.debug("{}Creating tag {}...", aLevelPadding, HexUtil.toHexString(aBuf, aOffset, aLength));
+            log.debug("{}Creating tag {}...", aLevelPadding, HexUtil.toFormattedHexString(aBuf, aOffset, aLength));
         }
         return new BerTag(aBuf, aOffset, aLength);
     }
 
-    private int getTagOffset(byte[] aBuf, int aOffset) {
+    private int getTagBytesCount(byte[] aBuf, int aOffset) {
         if((aBuf[aOffset] & 0x1F) == 0x1F) { // see subsequent bytes
             int len = 2;
             for(int i=aOffset+1; i<aOffset+10; i++) {
@@ -188,7 +202,7 @@ public class BerTlvParser {
         return length;
     }
 
-    private static int getDataOffset(byte aBuf[], int aOffset) {
+    private static int getLengthBytesCount(byte aBuf[], int aOffset) {
 
         int len = aBuf[aOffset] & 0xff;
         if( (len & 0x80) == 0x80) {
