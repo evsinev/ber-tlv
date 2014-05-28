@@ -82,4 +82,43 @@ public class BerTlvBuilderTest {
         System.out.println("list = " + list);
 
     }
+
+    @Test
+    public void testAddComplex() {
+        byte[] expectedBuffer = HexUtil.parseHex("E08191717F9F180412345678860D842400\n" +
+                "                      00085AE957E8818D95A8860D84240000\n" +
+                "                      0836D244954747EC1E860D8424000008\n" +
+                "                      3863B1C179BE38AC860D842400000825\n" +
+                "                      4DB4B4ECDB2174860D8424000008678D\n" +
+                "                      F9128478E28F860D8424000008514C8F\n" +
+                "                      D95A216C0B860D84240000081F623465\n" +
+                "                      DB0C9559860D84240000082A5A0A9A82\n" +
+                "                      8ABA0A910A42500E4381A4677A30308A\n" +
+                "                      023030\n");
+        BerTlv source = new BerTlvParser().parseConstructed(expectedBuffer);
+
+        BerTlvLogger.log("....", source, new BerTlvLoggerSlf4j());
+        {
+            byte[] out = BerTlvBuilder
+                    .from(source)
+                    .buildArray();
+
+            BerTlv outTlv = BerTlvBuilder
+                    .from(source)
+                    .buildTlv();
+
+            BerTlvLogger.log("....", outTlv, new BerTlvLoggerSlf4j());
+
+            Assert.assertArrayEquals(expectedBuffer, out);
+        }
+
+        {
+            BerTlv outTlv = new BerTlvBuilder().addBerTlv(source).buildTlv();
+            byte[] out = new BerTlvBuilder().addBerTlv(source).buildArray();
+
+            BerTlvLogger.log("....", outTlv, new BerTlvLoggerSlf4j());
+            Assert.assertArrayEquals(expectedBuffer, out);
+        }
+
+    }
 }

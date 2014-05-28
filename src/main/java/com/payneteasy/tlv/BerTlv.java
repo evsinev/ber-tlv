@@ -14,7 +14,7 @@ public class BerTlv {
 
     private final BerTag theTag;
     private final byte[] theValue;
-    private final List<BerTlv> theList;
+    protected final List<BerTlv> theList;
 
     /**
      * Creates constructed TLV
@@ -120,7 +120,7 @@ public class BerTlv {
 
     public byte[] getBytesValue() {
         if(isConstructed()) {
-            throw new IllegalStateException("TLV is constructed");
+            throw new IllegalStateException("TLV ["+theTag+"]is constructed");
         }
         return theValue;
     }

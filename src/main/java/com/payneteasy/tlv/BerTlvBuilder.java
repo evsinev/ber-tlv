@@ -23,12 +23,23 @@ public class BerTlvBuilder {
         this(aTemplate, new byte[DEFAULT_SIZE], 0, DEFAULT_SIZE);
     }
 
-
     public BerTlvBuilder(BerTag aTemplate, byte[] aBuffer, int aOffset, int aLength) {
         theTemplate  = aTemplate;
         theBuffer = aBuffer;
         thePos = aOffset;
         theBufferOffset = aOffset;
+    }
+
+    public static BerTlvBuilder from(BerTlv aTlv) {
+        if(aTlv.isConstructed()) {
+            BerTlvBuilder builder = template(aTlv.getTag());
+            for (BerTlv tlv : aTlv.theList) {
+                builder.addBerTlv(tlv);
+            }
+            return builder;
+        } else {
+            return new BerTlvBuilder().addBerTlv(aTlv);
+        }
     }
 
     public static BerTlvBuilder template(BerTag aTemplate) {
@@ -167,7 +178,11 @@ public class BerTlvBuilder {
 
 
     public BerTlvBuilder addBerTlv(BerTlv aTlv) {
-        return addBytes(aTlv.getTag(), aTlv.getBytesValue());
+        if(aTlv.isConstructed()) {
+            return add(from(aTlv));
+        } else {
+            return addBytes(aTlv.getTag(), aTlv.getBytesValue());
+        }
     }
 
     /**

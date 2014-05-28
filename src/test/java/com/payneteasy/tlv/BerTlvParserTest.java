@@ -51,12 +51,22 @@ public class BerTlvParserTest {
         Assert.assertEquals(2, tlvs.findAll(T_EF).size());
 
         // first EF
-        BerTlv firstEf = tlvs.find(T_EF);
-        Assert.assertNotNull(firstEf);
-        Assert.assertNotNull(firstEf.find(TAG_DF0D_ID));
-        Assert.assertEquals("M000-MPI", firstEf.find(TAG_DF0D_ID).getTextValue());
-        Assert.assertNotNull("No EF / DF7F tag found", firstEf.find(TAG_DF7F_VERSION));
-        Assert.assertEquals("1-22", firstEf.find(TAG_DF7F_VERSION).getTextValue());
+        {
+            BerTlv firstEf = tlvs.find(T_EF);
+            Assert.assertNotNull(firstEf);
+            Assert.assertNotNull(firstEf.find(TAG_DF0D_ID));
+            Assert.assertEquals("M000-MPI", firstEf.find(TAG_DF0D_ID).getTextValue());
+            Assert.assertNotNull("No EF / DF7F tag found", firstEf.find(TAG_DF7F_VERSION));
+            Assert.assertEquals("1-22", firstEf.find(TAG_DF7F_VERSION).getTextValue());
+        }
+
+        // second EF
+        BerTlv secondEf = tlvs.findAll(T_EF).get(1);
+        Assert.assertNotNull(secondEf);
+        Assert.assertNotNull(secondEf.find(TAG_DF0D_ID));
+        Assert.assertEquals("M000-TESTOS", secondEf.find(TAG_DF0D_ID).getTextValue());
+        Assert.assertNotNull("No EF / DF7F tag found", secondEf.find(TAG_DF7F_VERSION));
+        Assert.assertEquals("6-5", secondEf.find(TAG_DF7F_VERSION).getTextValue());
 
 
     }
