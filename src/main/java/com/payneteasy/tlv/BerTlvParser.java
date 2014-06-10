@@ -2,6 +2,7 @@ package com.payneteasy.tlv;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -32,8 +33,8 @@ public class BerTlvParser {
     }
 
     public BerTlvs parse(byte[] aBuf, final int aOffset, int aLen) {
-        BerTlvs tlvs = new BerTlvs();
-        if(aLen==0) return tlvs;
+        List<BerTlv> tlvs = new ArrayList<BerTlv>();
+        if(aLen==0) return new BerTlvs(tlvs);
 
         int offset = aOffset;
         for(int i=0; i<100; i++) {
@@ -48,7 +49,7 @@ public class BerTlvParser {
 
         }
 
-        return tlvs;
+        return new BerTlvs(tlvs);
     }
 
     private ParseResult parseWithResult(int aLevel, byte[] aBuf, int aOffset, int aLen) {

@@ -5,12 +5,8 @@ import java.util.List;
 
 public class BerTlvs {
 
-    public void add(BerTlv aTlv) {
-        tlvs.add(aTlv);
-    }
-
-    public List<BerTlv> getList() {
-        return tlvs;
+    protected BerTlvs(List<BerTlv> aTlvs) {
+        tlvs = aTlvs;
     }
 
     public BerTlv find(BerTag aTag) {
@@ -31,5 +27,10 @@ public class BerTlvs {
         return list;
     }
 
-    private final List<BerTlv> tlvs = new ArrayList<BerTlv>();
+
+    protected List<BerTlv> getList() {
+        return tlvs;
+    }
+
+    private final List<BerTlv> tlvs;
 }
