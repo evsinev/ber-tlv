@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.payneteasy.tlv.BerTlvBuilder.template;
+import static com.payneteasy.tlv.HexUtil.parseHex;
 
 public class BerTlvBuilderTest {
 
@@ -56,7 +57,7 @@ public class BerTlvBuilderTest {
                 .addHex(new BerTag(0x50), "56495341")
                 .addHex(new BerTag(0x57), "1000023100000033D44122011003400000481F")
                 .buildArray();
-        Assert.assertArrayEquals(HexUtil.parseHex(hex), bytes);
+        Assert.assertArrayEquals(parseHex(hex), bytes);
     }
 
     @Test
@@ -104,7 +105,7 @@ public class BerTlvBuilderTest {
         /*   90 */ + "8a 02 30 30                                         " // ..00
         ;
 
-        byte[] expectedBuffer = HexUtil.parseHex(hex);
+        byte[] expectedBuffer = parseHex(hex);
         BerTlv source = new BerTlvParser().parseConstructed(expectedBuffer);
 
         BerTlvLogger.log("....", source, new BerTlvLoggerSlf4j());
@@ -129,6 +130,32 @@ public class BerTlvBuilderTest {
             BerTlvLogger.log("....", outTlv, new BerTlvLoggerSlf4j());
             Assert.assertArrayEquals(expectedBuffer, out);
         }
+
+    }
+
+    @Test
+    public void addToTlvs() {
+        //  [72]
+        //  [9F18] 00009123
+        //          [86] 84DA00CB0E0000000000008EBD6E174BAFE4E7
+        //          [91] ED3C3B8B03928D0E0012
+        String in = "721C9F180400009123861384DA00CB0E0000000000008EBD6E174BAFE4E7910AED3C3B8B03928D0E0012";
+
+        // [72]
+        // [9F18] 00009123
+        //         [86] 84DA00CB0E0000000000008EBD6E174BAFE4E7
+        //         [91] ED3C3B8B03928D0E0012
+        // [8A] 00
+        String out = "721C9F180400009123861384DA00CB0E0000000000008EBD6E174BAFE4E7910AED3C3B8B03928D0E00128A0100";
+
+        BerTlvs tlvs = new BerTlvParser().parse(parseHex(in));
+
+
+        BerTlvBuilder builder = new BerTlvBuilder(tlvs);
+        builder.addBerTlv(new BerTlv(new BerTag(0x8a), new byte[] {0x00}));
+
+        Assert.assertEquals(out, HexUtil.toHexString(builder.buildArray()));
+
 
     }
 }

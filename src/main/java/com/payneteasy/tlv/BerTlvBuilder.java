@@ -16,11 +16,19 @@ public class BerTlvBuilder {
     private static final int DEFAULT_SIZE = 1024;
 
     public BerTlvBuilder() {
-        this(null);
+        this((BerTag)null);
     }
 
     public BerTlvBuilder(BerTag aTemplate) {
         this(aTemplate, new byte[DEFAULT_SIZE], 0, DEFAULT_SIZE);
+    }
+
+
+    public BerTlvBuilder(BerTlvs tlvs) {
+        this((BerTag)null);
+        for (BerTlv tlv : tlvs.getList()) {
+            addBerTlv(tlv);
+        }
     }
 
     public BerTlvBuilder(BerTag aTemplate, byte[] aBuffer, int aOffset, int aLength) {
