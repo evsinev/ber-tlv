@@ -8,7 +8,7 @@
         <version>4</version>
     </parent>
 
-    <groupId>com.payneteasy.ber-tlv</groupId>
+    <groupId>com.payneteasy</groupId>
     <artifactId>ber-tlv</artifactId>
     <version>1.0-2-SNAPSHOT</version>
 
