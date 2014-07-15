@@ -2,24 +2,31 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
 
-    <artifactId>ber-tlv</artifactId>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>4</version>
+    </parent>
+
     <groupId>com.payneteasy.ber-tlv</groupId>
+    <artifactId>ber-tlv</artifactId>
     <version>1.0-1-SNAPSHOT</version>
 
     <name>ber-tlv  ${version}</name>
 
     <description>BER-TLV reader and writer</description>
 
-    <url>https://github.com/evsinev/j2me-hotp</url>
+    <url>https://github.com/evsinev/ber-tlv</url>
 
     <scm>
         <connection>scm:git:git@github.com:evsinev/ber-tlv.git</connection>
         <developerConnection>scm:git:git@github.com:evsinev/ber-tlv.git</developerConnection>
-        <url>https://github.com/evsinev/j2me-hotp</url>
+        <url>https://github.com/evsinev/ber-tlv</url>
     </scm>
 
     <developers>
         <developer>
+            <id>esinev</id>
             <name>Evgeniy Sinev</name>
             <email>esinev@gmail.com</email>
         </developer>
@@ -34,12 +41,19 @@
             <name>sonatype oss RELEASE repository</name>
             <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
+
         <snapshotRepository>
             <id>ber-tlv-snapshot</id>
             <name>sonatype oss SNAPSHOT repository</name>
             <url>http://oss.sonatype.org/content/repositories/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
+
+        <site>
+            <id>local-site</id>
+            <name>Store only on local disk</name>
+            <url>file:///tmp/mysql-scheduler-site</url>
+        </site>
     </distributionManagement>
 
     <dependencies>
