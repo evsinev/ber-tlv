@@ -28,7 +28,7 @@
         <developer>
             <id>esinev</id>
             <name>Evgeniy Sinev</name>
-            <email>es@payneteasy.com</email>
+            <email>esinev@gmail.com</email>
         </developer>
     </developers>
 
@@ -39,7 +39,7 @@
         <repository>
             <id>ber-tlv-release</id>
             <name>sonatype oss RELEASE repository</name>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
 
         <snapshotRepository>
