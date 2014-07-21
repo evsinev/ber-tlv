@@ -1,6 +1,6 @@
 package com.payneteasy.tlv;
 
-class HexUtil {
+public class HexUtil {
 
     private static final char[] CHARS_TABLES = "0123456789ABCDEF".toCharArray();
     private static final byte[] BYTES = new byte[128];

@@ -28,7 +28,7 @@ public class BerTlvs {
     }
 
 
-    protected List<BerTlv> getList() {
+    public List<BerTlv> getList() {
         return tlvs;
     }
 
