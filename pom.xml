@@ -10,7 +10,7 @@
 
     <groupId>com.payneteasy</groupId>
     <artifactId>ber-tlv</artifactId>
-    <version>1.0-4</version>
+    <version>1.0-5-SNAPSHOT</version>
 
     <name>ber-tlv  ${version}</name>
 
