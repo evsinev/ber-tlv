@@ -3,7 +3,7 @@ package com.payneteasy.tlv;
 public class HexUtil {
 
     private static final char[] CHARS_TABLES = "0123456789ABCDEF".toCharArray();
-    private static final byte[] BYTES = new byte[128];
+    static final byte[] BYTES = new byte[128];
 
     static {
         for (int i = 0; i < 10; i++) {

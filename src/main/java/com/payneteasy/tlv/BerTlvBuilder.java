@@ -13,7 +13,7 @@ public class BerTlvBuilder {
 
     private static final Charset ASCII = Charset.forName("US-ASCII");
     private static final BigDecimal HUNDRED = new BigDecimal(100);
-    private static final int DEFAULT_SIZE = 1024;
+    private static final int DEFAULT_SIZE = 5 * 1024;
 
     public BerTlvBuilder() {
         this((BerTag)null);
@@ -162,18 +162,22 @@ public class BerTlvBuilder {
         return addBytes(aObject, aBytes, 0, aBytes.length);
     }
 
-    public BerTlvBuilder addBytes(BerTag aObject, byte[] aBytes, int aFrom, int aLength) {
-        // type
-        int typeLen = aObject.bytes.length;
-        System.arraycopy(aObject.bytes, 0, theBuffer, thePos, typeLen);
-        thePos+=typeLen;
+    public BerTlvBuilder addBytes(BerTag aTag, byte[] aBytes, int aFrom, int aLength) {
+        int tagLength        = aTag.bytes.length;
+        int lengthBytesCount = calculateBytesCountForLength(aLength);
 
-        // len
-        theBuffer[thePos++] = (byte) aLength;
+        // TAG
+        System.arraycopy(aTag.bytes, 0, theBuffer, thePos, tagLength);
+        thePos+=tagLength;
 
-        // value
+        // LENGTH
+        fillLength(theBuffer, thePos, aLength);
+        thePos += lengthBytesCount;
+
+        // VALUE
         System.arraycopy(aBytes, aFrom, theBuffer, thePos, aLength);
         thePos+=aLength;
+
         return this;
     }
 

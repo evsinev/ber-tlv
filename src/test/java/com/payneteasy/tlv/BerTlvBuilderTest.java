@@ -158,4 +158,16 @@ public class BerTlvBuilderTest {
 
 
     }
+
+    @Test
+    public void testBigData() {
+        byte[] bigData = new byte[1024];
+
+        BerTlvBuilder builder = new BerTlvBuilder();
+        builder.addBytes(new BerTag(0xd8), bigData);
+        BerTlvs berTlvs = builder.buildTlvs();
+        BerTlvLogger.log("    ", berTlvs, new BerTlvLoggerSlf4j());
+
+        Assert.assertEquals(1, berTlvs.getList().size());
+    }
 }
