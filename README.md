@@ -27,3 +27,6 @@ byte[] bytes =  new BerTlvBuilder()
 ```
 
 
+## License
+
+The BerTlv framework is licensed under the Apache License 2.0
