@@ -116,7 +116,7 @@ public class BerTlvParser {
     private void addChildren(int aLevel, byte[] aBuf, int aOffset, String levelPadding, int aTagBytesCount, int aDataBytesCount, int valueLength, ArrayList<BerTlv> list) {
         int startPosition = aOffset + aTagBytesCount + aDataBytesCount;
         int len = valueLength;
-        while (startPosition < aOffset + valueLength) {
+        while (startPosition <= aOffset + valueLength) {
             ParseResult result = parseWithResult(aLevel+1, aBuf, startPosition, len);
             list.add(result.tlv);
 

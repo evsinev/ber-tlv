@@ -3,6 +3,7 @@ package com.payneteasy.tlv;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.payneteasy.tlv.BerTlvBuilder.template;
@@ -160,6 +161,18 @@ public class BerTlvBuilderTest {
     }
 
     @Test
+    public void getContructedTagBytes() {
+        BerTlv constructedTag = new BerTlv(new BerTag(0xE4)
+                , Arrays.asList(new BerTlv(new BerTag(0x86), HexUtil.parseHex("ED3C3B8B03928D0E0012")))
+        );
+
+        BerTlvBuilder builder = new BerTlvBuilder();
+        builder.addBerTlv(constructedTag);
+        byte[] bytes = builder.buildArray();
+        Assert.assertEquals("[14] :  E4 0C 86 0A  ED 3C 3B 8B  03 92 8D 0E  00 12", HexUtil.toFormattedHexString(bytes));
+    }
+
+    @Test
     public void testBigData() {
         byte[] bigData = new byte[1024];
 
@@ -169,5 +182,38 @@ public class BerTlvBuilderTest {
         BerTlvLogger.log("    ", berTlvs, new BerTlvLoggerSlf4j());
 
         Assert.assertEquals(1, berTlvs.getList().size());
+    }
+
+    @Test
+    public void test_empty() {
+        BerTlv tlv = new BerTlv(new BerTag(0x01), new byte[]{});
+
+        byte[] bytes = new BerTlvBuilder(new BerTag(0xe3))
+                .addBerTlv(tlv)
+                .buildArray();
+
+        BerTlv berTlv = new BerTlvBuilder(new BerTag(0xe3))
+                .addBerTlv(tlv)
+                .buildTlv();
+
+        BerTlvLogger.log("    ", berTlv, new BerTlvLoggerSlf4j());
+
+        System.out.println("bytes = " + HexUtil.toFormattedHexString(bytes));
+    }
+
+    @Test
+    public void test_empty_length() {
+        BerTlv tlv = new BerTlv(new BerTag(0x01),new byte[]{});
+
+        BerTlv some = new BerTlvBuilder()
+                .addBytes(new BerTag(0xE3), new BerTlvBuilder().addBerTlv(tlv).buildArray())
+                .buildTlv();
+
+        Assert.assertEquals(some.getTag(), new BerTag(0xe3));
+        Assert.assertNotNull(some.getValues());
+        Assert.assertEquals(1, some.getValues().size());
+        BerTlv empty = some.getValues().get(0);
+        Assert.assertEquals(new BerTag(0x01), empty.getTag());
+        Assert.assertEquals("", empty.getHexValue());
     }
 }

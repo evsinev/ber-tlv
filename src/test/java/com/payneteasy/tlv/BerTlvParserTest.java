@@ -98,4 +98,17 @@ public class BerTlvParserTest {
 
 
     }
+
+    @Test
+    public void test_empty_length() {
+        BerTlv tlv = new BerTlvParser(LOG).parseConstructed(HexUtil.parseHex("E3 02 01 00"));
+        BerTlvLogger.log("    ", tlv, LOG);
+
+        Assert.assertEquals(tlv.getTag(), new BerTag(0xe3));
+        Assert.assertNotNull(tlv.getValues());
+        Assert.assertEquals(1, tlv.getValues().size());
+        BerTlv emptyTag = tlv.getValues().get(0);
+        Assert.assertEquals(new BerTag(0x01), emptyTag.getTag());
+        Assert.assertEquals("", emptyTag.getHexValue());
+    }
 }
