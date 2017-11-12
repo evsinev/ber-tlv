@@ -1,7 +1,7 @@
-ber-tlv
-=======
-
 BER-TLV parser and builder
+==========================
+
+[![Build Status](https://travis-ci.org/evsinev/ber-tlv.svg?branch=master)](https://travis-ci.org/evsinev/ber-tlv)
 
 
 How to parse
