@@ -143,6 +143,26 @@ public class BerTlv {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BerTlv berTlv = (BerTlv) o;
+
+        if (theTag != null ? !theTag.equals(berTlv.theTag) : berTlv.theTag != null) return false;
+        if (!Arrays.equals(theValue, berTlv.theValue)) return false;
+        return theList != null ? theList.equals(berTlv.theList) : berTlv.theList == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = theTag != null ? theTag.hashCode() : 0;
+        result = 31 * result + Arrays.hashCode(theValue);
+        result = 31 * result + (theList != null ? theList.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
 
         return "BerTlv{" +
