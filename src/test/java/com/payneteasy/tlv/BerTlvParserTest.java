@@ -111,4 +111,12 @@ public class BerTlvParserTest {
         Assert.assertEquals(new BerTag(0x01), emptyTag.getTag());
         Assert.assertEquals("", emptyTag.getHexValue());
     }
+
+    @Test
+    public void test_empty_hex() {
+        byte[] bytes = HexUtil.parseHex("");
+        BerTlvParser parser = new BerTlvParser(LOG);
+        BerTlvs tlvs = parser.parse(bytes, 0, bytes.length);
+        Assert.assertEquals(0, tlvs.getList().size());
+    }
 }
