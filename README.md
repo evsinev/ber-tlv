@@ -1,9 +1,35 @@
-[![one-nio](https://maven-badges.herokuapp.com/maven-central/com.payneteasy/ber-tlv/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.payneteasy/ber-tlv)
+[![maven](https://maven-badges.herokuapp.com/maven-central/com.payneteasy/ber-tlv/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.payneteasy/ber-tlv)
 [![Build Status](https://travis-ci.org/evsinev/ber-tlv.svg?branch=master)](https://travis-ci.org/evsinev/ber-tlv)
 
 BER-TLV parser and builder
 ==========================
 
+BerTlv is a java library for parsing and building BER TLV encoded data.
+
+## Features
+
+* supported types: amount, date, time, text, BCD, bytes
+* thread safe (provides immutable container BerTlv)
+* production ready (uses in several projects)
+* lightweight (no external dependencies)
+
+## Setup with dependency managers
+
+### Maven
+
+```xml
+<dependency>
+  <groupId>com.payneteasy</groupId>
+  <artifactId>ber-tlv</artifactId>
+  <version>$VERSION</version>
+</dependency>
+```
+
+### Gradle
+
+```groovy
+compile 'com.payneteasy:ber-tlv:$VERSION'
+```
 
 How to parse
 ------------
