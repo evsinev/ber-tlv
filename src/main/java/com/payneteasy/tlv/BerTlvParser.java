@@ -81,7 +81,7 @@ public class BerTlvParser {
         if(tag.isConstructed()) {
 
             ArrayList<BerTlv> list = new ArrayList<BerTlv>();
-            addChildren(aLevel, aBuf, aOffset, levelPadding, tagBytesCount, lengthBytesCount, valueLength, list);
+            addChildren(aLevel, aBuf, aOffset + tagBytesCount + lengthBytesCount, levelPadding, lengthBytesCount, valueLength, list);
 
             int resultOffset = aOffset + tagBytesCount + lengthBytesCount + valueLength;
             if(log.isDebugEnabled()) {
@@ -108,20 +108,19 @@ public class BerTlvParser {
      * @param aBuf            buffer
      * @param aOffset         offset (first byte)
      * @param levelPadding    level padding (for debug)
-     * @param aTagBytesCount  tag bytes count
      * @param aDataBytesCount data bytes count
      * @param valueLength     length
      * @param list            list to add
      */
-    private void addChildren(int aLevel, byte[] aBuf, int aOffset, String levelPadding, int aTagBytesCount, int aDataBytesCount, int valueLength, ArrayList<BerTlv> list) {
-        int startPosition = aOffset + aTagBytesCount + aDataBytesCount;
+    private void addChildren(int aLevel, byte[] aBuf, int aOffset, String levelPadding, int aDataBytesCount, int valueLength, ArrayList<BerTlv> list) {
+        int startPosition = aOffset;
         int len = valueLength;
-        while (startPosition <= aOffset + valueLength) {
+        while (startPosition < aOffset + valueLength ) {
             ParseResult result = parseWithResult(aLevel+1, aBuf, startPosition, len);
             list.add(result.tlv);
 
             startPosition = result.offset;
-            len           = valueLength - startPosition;
+            len           = (aOffset + valueLength) - startPosition;
 
             if(log.isDebugEnabled()) {
                 log.debug("{}level {}: adding {} with offset {}, startPosition={}, aDataBytesCount={}, valueLength={}"
