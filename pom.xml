@@ -10,7 +10,7 @@
 
     <groupId>com.payneteasy</groupId>
     <artifactId>ber-tlv</artifactId>
-    <version>1.0-10</version>
+    <version>1.0-11-SNAPSHOT</version>
 
     <name>ber-tlv ${project.version}</name>
 
@@ -22,7 +22,7 @@
         <connection>scm:git:git@github.com:evsinev/ber-tlv.git</connection>
         <developerConnection>scm:git:git@github.com:evsinev/ber-tlv.git</developerConnection>
         <url>https://github.com/evsinev/ber-tlv</url>
-      <tag>ber-tlv-1.0-10</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <developers>
