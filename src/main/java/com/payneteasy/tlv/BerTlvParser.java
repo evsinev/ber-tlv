@@ -9,16 +9,28 @@ import java.util.List;
  */
 public class BerTlvParser {
 
+	private static final BerTagFactory DEFAULT_TAG_FACTORY = new DefaultBerTagFactory();
+
+	private final BerTagFactory tagFactory;
     private final IBerTlvLogger log;
 
     public BerTlvParser() {
-        this(EMPTY_LOGGER);
+        this(DEFAULT_TAG_FACTORY, EMPTY_LOGGER);
     }
 
     public BerTlvParser(IBerTlvLogger aLogger) {
-        log = aLogger;
+    	this(DEFAULT_TAG_FACTORY, aLogger);
     }
-
+    
+    public BerTlvParser(BerTagFactory aTagFactory) {
+    	this(aTagFactory, EMPTY_LOGGER);
+    }
+    
+    public BerTlvParser(BerTagFactory aTagFactory, IBerTlvLogger aLogger) {
+    	tagFactory = aTagFactory;
+    	log = aLogger;
+    }
+    
     public BerTlv parseConstructed(byte[] aBuf) {
         return parseConstructed(aBuf, 0, aBuf.length);
     }
@@ -164,7 +176,7 @@ public class BerTlvParser {
         if(log.isDebugEnabled()) {
             log.debug("{}Creating tag {}...", aLevelPadding, HexUtil.toFormattedHexString(aBuf, aOffset, aLength));
         }
-        return new BerTag(aBuf, aOffset, aLength);
+        return tagFactory.createTag(aBuf, aOffset, aLength);
     }
 
     private int getTagBytesCount(byte[] aBuf, int aOffset) {
