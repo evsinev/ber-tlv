@@ -39,19 +39,27 @@ public class BerTlvBuilder {
     }
 
     public static BerTlvBuilder from(BerTlv aTlv) {
+        return from(aTlv, DEFAULT_SIZE);
+    }
+
+    public static BerTlvBuilder from(BerTlv aTlv, int bufferSize) {
         if(aTlv.isConstructed()) {
-            BerTlvBuilder builder = template(aTlv.getTag());
+            BerTlvBuilder builder = template(aTlv.getTag(), bufferSize);
             for (BerTlv tlv : aTlv.theList) {
                 builder.addBerTlv(tlv);
             }
             return builder;
         } else {
-            return new BerTlvBuilder().addBerTlv(aTlv);
+            return new BerTlvBuilder(null, new byte[bufferSize], 0, bufferSize).addBerTlv(aTlv);
         }
     }
 
     public static BerTlvBuilder template(BerTag aTemplate) {
-        return new BerTlvBuilder(aTemplate);
+        return template(aTemplate, DEFAULT_SIZE);
+    }
+
+    public static BerTlvBuilder template(BerTag aTemplate, int bufferSize) {
+        return new BerTlvBuilder(aTemplate, new byte[bufferSize], 0, bufferSize);
     }
 
     public BerTlvBuilder addEmpty(BerTag aObject) {
@@ -191,7 +199,7 @@ public class BerTlvBuilder {
 
     public BerTlvBuilder addBerTlv(BerTlv aTlv) {
         if(aTlv.isConstructed()) {
-            return add(from(aTlv));
+            return add(from(aTlv, theBuffer.length));
         } else {
             return addBytes(aTlv.getTag(), aTlv.getBytesValue());
         }
@@ -252,4 +260,3 @@ public class BerTlvBuilder {
     private final byte[] theBuffer;
     private final BerTag theTemplate;
 }
-
