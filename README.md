@@ -22,14 +22,14 @@ BerTlv is a java library for parsing and building BER TLV encoded data.
 <dependency>
   <groupId>com.payneteasy</groupId>
   <artifactId>ber-tlv</artifactId>
-  <version>$VERSION</version>
+  <version>1.0-11</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-compile 'com.payneteasy:ber-tlv:$VERSION'
+implementation 'com.payneteasy:ber-tlv:1.0-11'
 ```
 
 How to parse
