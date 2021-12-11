@@ -51,7 +51,10 @@ public class BerTlvParser {
         int offset = aOffset;
         for(int i=0; i<100; i++) {
             ParseResult result =  parseWithResult(0, aBuf, offset, aLen-offset);
-            tlvs.add(result.tlv);
+
+            if (!result.ignoreTag) {
+                tlvs.add(result.tlv);
+            }
 
             if(result.offset>=aOffset+aLen) {
                 break;
@@ -80,6 +83,11 @@ public class BerTlvParser {
             log.debug("{}tag = {}, tagBytesCount={}, tagBuf={}", levelPadding, tag, tagBytesCount, HexUtil.toFormattedHexString(aBuf, aOffset, tagBytesCount));
         }
 
+        // check invalid 00 tag byte with no meaning.
+        if ((tag.bytes[0] & 0xFF) == 0x00) {
+            return new ParseResult(null, aOffset + 1, true);
+        }
+
         // length
         int lengthBytesCount  = getLengthBytesCount(aBuf, aOffset + tagBytesCount);
         int valueLength       = getDataLength(aBuf, aOffset + tagBytesCount);
@@ -99,7 +107,7 @@ public class BerTlvParser {
             if(log.isDebugEnabled()) {
                 log.debug("{}returning constructed offset = {}", levelPadding, resultOffset);
             }
-            return new ParseResult(new BerTlv(tag, list), resultOffset);
+            return new ParseResult(new BerTlv(tag, list), resultOffset, false);
         } else {
             // value
             byte[] value = new byte[valueLength];
@@ -109,7 +117,7 @@ public class BerTlvParser {
                 log.debug("{}value = {}", levelPadding, HexUtil.toFormattedHexString(value));
                 log.debug("{}returning primitive offset = {}", levelPadding, resultOffset);
             }
-            return new ParseResult(new BerTlv(tag, value), resultOffset);
+            return new ParseResult(new BerTlv(tag, value), resultOffset, false);
         }
 
     }
@@ -154,9 +162,10 @@ public class BerTlvParser {
     }
 
     private static class ParseResult {
-        public ParseResult(BerTlv aTlv, int aOffset) {
+        public ParseResult(BerTlv aTlv, int aOffset, boolean aIgnoreTag) {
             tlv = aTlv;
             offset = aOffset;
+            ignoreTag = aIgnoreTag;
         }
 
         @Override
@@ -169,6 +178,7 @@ public class BerTlvParser {
 
         private final BerTlv tlv;
         private final int offset;
+        private final boolean ignoreTag;
     }
 
 
@@ -189,9 +199,9 @@ public class BerTlvParser {
                 len++;
             }
             return len;
-        } else {
-            return 1;
         }
+
+        return 1;
     }
 
 
